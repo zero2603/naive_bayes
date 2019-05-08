@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="page-header">
-    <h2>Training & Testing</h2>
+    <h2>Training Data</h2>
 </div>
 
 <form action="/testing/" method='POST'>
@@ -21,14 +21,12 @@
                 </div>
             </div>
             <div class="form-group">
-                <div class="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id="customRadio3" name="is_stemming" class="custom-control-input" value=1>
-                    <label class="custom-control-label" for="customRadio3">Stemming</label>
-                </div>
-                <div class="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id="customRadio4" name="is_stemming" class="custom-control-input" value=0>
-                    <label class="custom-control-label" for="customRadio4">No stemming</label>
-                </div>
+                <label>Processing type</label>
+                <select class="custom-select" name="processing_type">
+                    <option value="stemming">Stemming</option>
+                    <option value="lemmatizing">Lemmatization</option>
+                    <option value="none">None</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Algorithm</label>
@@ -43,12 +41,8 @@
                     <option value="1">Training</option>
                 </select>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <button class="btn btn-primary w-100">TRAINING</button>
-            <div>
-                <h3>Training success!</h3>
+            <div class="form-group">
+                <button class="btn btn-primary">TRAINING</button>
             </div>
         </div>
     </div>

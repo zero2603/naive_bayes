@@ -7,6 +7,7 @@ import copy
 import json
 import nltk
 from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer 
 
 # Document class to store email instances easier
 class Document:
@@ -25,6 +26,9 @@ class Document:
 
     def getText(self):
         return self.text
+    
+    def setText(self, new_text):
+        self.text = new_text
 
     def getWordFreqs(self):
         return self.word_freqs
@@ -65,6 +69,7 @@ def extractVocab(data_set):
     v = []
     for x in data_set:
         all_text += data_set[x].getText()
+    
     for y in bagOfWords(all_text):
         v.append(y)
     return v
@@ -76,16 +81,6 @@ def setStopWords():
     with open('stop_words.txt', 'r') as txt:
         stops = (txt.read().splitlines())
     return stops
-
-
-# Remove stop words from data set and store in dictionary
-# def removeStopWords(stops, data_set):
-#     filtered_data_set = copy.deepcopy(data_set)
-#     for i in stops:
-#         for j in filtered_data_set:
-#             if i in filtered_data_set[j].getWordFreqs():
-#                 del filtered_data_set[j].getWordFreqs()[i]
-#     return filtered_data_set
 
 def removeStopWords(vocabulary):
     stops = []
@@ -107,9 +102,16 @@ def stemming(vocabulary):
         stem_t = porter.stem(t)
         if not stem_t in new_vocabulary:
             new_vocabulary.append(stem_t)
-    
     return new_vocabulary
 
+def lemmatizing(vocabulary):
+    lemmatizer = WordNetLemmatizer() 
+    new_vocabulary = []
+    for t in vocabulary:
+        stem_t = lemmatizer.lemmatize(t)
+        if not stem_t in new_vocabulary:
+            new_vocabulary.append(stem_t)
+    return new_vocabulary
 
 # Training
 def trainMultinomialNB(training, classes, priors, cond, options):
@@ -119,8 +121,10 @@ def trainMultinomialNB(training, classes, priors, cond, options):
         v = removeStopWords(v)
 
     # v is the vocabulary of the training set
-    if int(options['is_stemming']):
+    if options['processing_type'] == 'stemming':
         v = stemming(v)
+    elif options['processing_type'] == 'lemmatizing':
+        v = lemmatizing(v)
         
     # n is the number of documents
     n = len(training)
@@ -156,16 +160,16 @@ def trainMultinomialNB(training, classes, priors, cond, options):
 def applyMultinomialNB(data_instance, classes, priors, cond):
     score = {}
     for c in classes:
-        score[c] = math.log10(float(priors[c]))
+        score[c] = float(math.log10(priors[c]))
         for t in data_instance.getWordFreqs():
             if (t + "_" + c) in cond:
                 score[c] += float(math.log10(cond[t + "_" + c]))
+    
     if score["spam"] > score["ham"]:
         return "spam"
     else:
         return "ham"
     # return score['ham']
-
 
 # Training
 def trainBernoulliNB(training, classes, priors, cond, options):
@@ -177,8 +181,10 @@ def trainBernoulliNB(training, classes, priors, cond, options):
         v = removeStopWords(v)
 
     # v is the vocabulary of the training set
-    if int(options['is_stemming']):
+    if options['processing_type'] == 'stemming':
         v = stemming(v)
+    elif options['processing_type'] == 'lemmatizing':
+        v = lemmatizing(v)
 
     # n is the number of documents
     n = len(training)
@@ -220,7 +226,7 @@ def applyBernoulliNB(data_instance, classes, priors, cond):
     with open('learned/vocabulary.json', 'r') as f:
         v = json.load(f)
 
-    tokens = nltk.word_tokenize(data_instance)
+    tokens = data_instance.getWordFreqs()
     for c in classes:
         score[c] = float(math.log10(priors[c]))
 

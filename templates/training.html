@@ -1,0 +1,57 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Training & Testing</h2>
+</div>
+
+<form action="/testing/" method='POST'>
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id="customRadio1" name="is_remove_stopword" class="custom-control-input" value=1>
+                    <label class="custom-control-label" for="customRadio1">Remove stopword</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id="customRadio2" name="is_remove_stopword" class="custom-control-input" value=0>
+                    <label class="custom-control-label" for="customRadio2">Keep stopword</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id="customRadio3" name="is_stemming" class="custom-control-input" value=1>
+                    <label class="custom-control-label" for="customRadio3">Stemming</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id="customRadio4" name="is_stemming" class="custom-control-input" value=0>
+                    <label class="custom-control-label" for="customRadio4">No stemming</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Algorithm</label>
+                <select class="custom-select" name="algorithm">
+                    <option value="multinomial">Multinomial NB</option>
+                    <option value="bernoulli">Bernoulli NB</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select class="custom-select" name="is_training">
+                    <option value="0">No training</option>
+                    <option value="1">Training</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <button class="btn btn-primary w-100">TRAINING</button>
+            <div>
+                <h3>Training success!</h3>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

@@ -3,10 +3,19 @@ from django.template.response import TemplateResponse
 from django.template import loader
 import helper 
 import json
+import random
+import processing
+from datetime import datetime
 
 # VARIABLE
 classes = ["ham", "spam"]
 
+# TRAIN AND TEST SET
+ham_training_set, ham_testing_set = processing.train_test_split_from_dir('emails/all/ham')
+spam_training_set, spam_testing_set = processing.train_test_split_from_dir('emails/all/spam')
+now = datetime.now()
+
+print(now)
 
 # CONTROLLER
 # return index page
@@ -23,11 +32,12 @@ def training(request):
     template = loader.get_template('testing.html')
 
     data = request.POST
-
-    helper.makeDataSet(training_set, 'emails/train/ham', 'ham')
-    helper.makeDataSet(training_set, 'emails/train/spam', 'spam')
+    
 
     if(int(data['is_training'])):
+        helper.makeDataSet(training_set, 'emails/all/ham', ham_training_set, 'ham')
+        helper.makeDataSet(training_set, 'emails/all/spam', spam_training_set, 'spam')
+
         if data['algorithm'] == 'multinomial':
             helper.trainMultinomialNB(training_set, classes, prior, conditional_probability, data)
         else:
@@ -98,8 +108,8 @@ def testMany(request):
     with open('learned/prior.json', 'r') as f:
         prior = json.load(f)
 
-    helper.makeDataSet(test_set, 'emails/test/ham', 'ham')
-    helper.makeDataSet(test_set, 'emails/test/spam', 'spam')
+    helper.makeDataSet(test_set, 'emails/all/ham', ham_testing_set, 'ham')
+    helper.makeDataSet(test_set, 'emails/all/spam', spam_testing_set, 'spam')
 
     correct_ham_guesses = 0
     correct_spam_guesses = 0
@@ -134,8 +144,10 @@ def testMany(request):
                 correct_spam_guesses += 1
         
         context = {
-            'correct_ham_guesses': correct_ham_guesses, 
+            'correct_ham_guesses': correct_ham_guesses,
+            'ham_len': len(ham_testing_set),
             'correct_spam_guesses': correct_spam_guesses,
+            'spam_len': len(spam_testing_set),
             'accuracy': float(correct_ham_guesses + correct_spam_guesses) / float(len(test_set))
         }
 

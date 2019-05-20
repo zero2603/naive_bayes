@@ -47,9 +47,18 @@ class Document:
 # the directory path should just be like "train/ham" for example
 # storage is the dictionary to store the email in
 # True class is the true classification of the email (spam or ham)
-def makeDataSet(storage_dict, directory, true_class):
-    for dir_entry in os.listdir(directory):
-        dir_entry_path = os.path.join(directory, dir_entry)
+# def makeDataSet(storage_dict, directory, true_class):
+#     for dir_entry in os.listdir(directory):
+#         dir_entry_path = os.path.join(directory, dir_entry)
+#         if os.path.isfile(dir_entry_path):
+#             with open(dir_entry_path, 'r') as text_file:
+#                 # stores dictionary of dictionary of dictionary as explained above in the initialization
+#                 text = text_file.read()
+#                 storage_dict.update({dir_entry_path: Document(text, bagOfWords(text), true_class)})
+
+def makeDataSet(storage_dict, directory, listFiles, true_class):
+    for f in listFiles:
+        dir_entry_path = os.path.join(directory, f)
         if os.path.isfile(dir_entry_path):
             with open(dir_entry_path, 'r') as text_file:
                 # stores dictionary of dictionary of dictionary as explained above in the initialization

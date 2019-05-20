@@ -5,26 +5,28 @@ import helper
 import json
 import random
 import processing
-from datetime import datetime
 
 # VARIABLE
 classes = ["ham", "spam"]
 
-# TRAIN AND TEST SET
-ham_training_set, ham_testing_set = processing.train_test_split_from_dir('emails/all/ham')
-spam_training_set, spam_testing_set = processing.train_test_split_from_dir('emails/all/spam')
-now = datetime.now()
-
-print(now)
-
 # CONTROLLER
 # return index page
 def index(request):
+    # TRAIN AND TEST SET
+    ham_training_set, ham_testing_set = processing.train_test_split_from_dir('emails/all/ham')
+    spam_training_set, spam_testing_set = processing.train_test_split_from_dir('emails/all/spam')
+
+    request.session['ham_training'] = ham_training_set
+    request.session['spam_training'] = spam_training_set
+    request.session['ham_testing'] = ham_testing_set
+    request.session['spam_testing'] = spam_testing_set
+
     template = loader.get_template('training.html')
     context = {}
     return HttpResponse(template.render(context, request))
 
 def training(request):
+
     training_set = dict()
     prior = dict()
     conditional_probability = dict()
@@ -35,8 +37,8 @@ def training(request):
     
 
     if(int(data['is_training'])):
-        helper.makeDataSet(training_set, 'emails/all/ham', ham_training_set, 'ham')
-        helper.makeDataSet(training_set, 'emails/all/spam', spam_training_set, 'spam')
+        helper.makeDataSet(training_set, 'emails/all/ham', request.session.get('ham_training'), 'ham')
+        helper.makeDataSet(training_set, 'emails/all/spam', request.session.get('spam_training'), 'spam')
 
         if data['algorithm'] == 'multinomial':
             helper.trainMultinomialNB(training_set, classes, prior, conditional_probability, data)
@@ -108,8 +110,8 @@ def testMany(request):
     with open('learned/prior.json', 'r') as f:
         prior = json.load(f)
 
-    helper.makeDataSet(test_set, 'emails/all/ham', ham_testing_set, 'ham')
-    helper.makeDataSet(test_set, 'emails/all/spam', spam_testing_set, 'spam')
+    helper.makeDataSet(test_set, 'emails/all/ham', request.session.get('ham_testing'), 'ham')
+    helper.makeDataSet(test_set, 'emails/all/spam', request.session.get('spam_testing'), 'spam')
 
     correct_ham_guesses = 0
     correct_spam_guesses = 0
@@ -145,9 +147,9 @@ def testMany(request):
         
         context = {
             'correct_ham_guesses': correct_ham_guesses,
-            'ham_len': len(ham_testing_set),
+            'ham_len': len(request.session.get('ham_testing')),
             'correct_spam_guesses': correct_spam_guesses,
-            'spam_len': len(spam_testing_set),
+            'spam_len': len(request.session.get('spam_testing')),
             'accuracy': float(correct_ham_guesses + correct_spam_guesses) / float(len(test_set))
         }
 

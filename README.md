@@ -7,6 +7,8 @@
 
 ## Cài đặt
 - Cài đặt Django ```pip install django```
+- Chạy lệnh ```python manage.py migrate``` để tạo bảng session (dùng lưu các biến session trong file views.py)
 - Cài đặt các thư viện punkt, wordnet của nltk
+- Cài đặt numpy, pandas,...
 - Mở terminal trong thư mục project, chạy lệnh ``` python manage.py runserver ```
 - Truy cập đường dẫn: http://127.0.0.1:8000/training

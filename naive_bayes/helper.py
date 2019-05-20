@@ -158,7 +158,7 @@ def trainMultinomialNB(training, classes, priors, cond, options):
 # Testing. Data instance is a Document
 # Returns classification guess
 def applyMultinomialNB(data_instance, classes, priors, cond):
-    score = {}
+    score = {"spam": 0, "ham": 0}
     for c in classes:
         score[c] = float(math.log10(priors[c]))
         for t in data_instance.getWordFreqs():

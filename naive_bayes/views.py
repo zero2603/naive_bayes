@@ -64,6 +64,8 @@ def test(request):
         words = helper.stemming(words)
     elif data['processing_type'] == 'lemmatizing':
         words = helper.lemmatizing(words)
+
+    new_text += " ".join(words)
     
     document = helper.Document(new_text, helper.bagOfWords(new_text), None)
 
